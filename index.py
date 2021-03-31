@@ -11,11 +11,10 @@ URL = "https://news.ycombinator.com/"
 page = requests.get(URL)
 soup = BeautifulSoup(page.content, 'html.parser')
 
-# data for each attribute
-# i'm pulling this all at the same time because the data could change if i pulled these at separate times
+# data for each attribute; pulled at the same time as the page is live
 titles_soup = soup.find_all(class_='athing')
-authors_soup = soup.find_all(class_='hnuser')
-scores_soup = soup.find_all(class_='score')
+# subtext soup contains the info for author & votes, so will iterate over that data separately
+subtext_soup = soup.find_all(class_='subtext')
 
 # I created a class for "Story". This is probably overkill, but it stores data nicely, and I was asked for a list of objects :)
 class Story:
@@ -28,6 +27,10 @@ class Story:
         self.title = title
         self.author = author
         self.score = score
+    
+    def __repr__(self):
+        return(f'{self.__class__.__name__}('
+        f'{self.title!r}, {self.author!r}, {self.score!r})')
 
 def create_titles_list(lst):
     """Given a list of Hacker News data, returns the title of each top story."""
@@ -46,7 +49,11 @@ def create_authors_list(lst):
     authors_list = []
 
     for item in lst:
-        authors_list.append(item.text)
+        author = item.find(class_='hnuser')
+        if author is None:
+            authors_list.append("N/A")
+        else:
+            authors_list.append(author.text)
     
     return authors_list
 
@@ -56,11 +63,24 @@ def create_scores_list(lst):
     scores_list = []
 
     for item in lst:
-        scores_list.append(item.text)
+        score = item.find('span', class_='score')
+        if score is None:
+            scores_list.append("N/A")
+        else:
+            scores_list.append(score.text)
     
     return scores_list
 
 top_titles = create_titles_list(titles_soup)
-top_authors = create_authors_list(authors_soup)
-top_scores = create_scores_list(scores_soup)
+top_authors = create_authors_list(subtext_soup)
+top_scores = create_scores_list(subtext_soup)
 
+all_stories = [] 
+
+for i in range(len(top_titles)):
+    _story = Story(title=top_titles[i], 
+                   author=top_authors[i], 
+                   score=top_scores[i])
+    all_stories.append(_story)
+
+print(all_stories)
