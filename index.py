@@ -1,36 +1,60 @@
+# Exercise: 
+# Create a web scraper that scrapes Hacker News and gathers the titles, corresponding author names, point values.
+# Print it as a list of objects.
+# Tip: Check first & last to make sure it's aligned (first author / last author are aligned)
+
 import requests
 from bs4 import BeautifulSoup
 
+# Using BeautifulSoup to scrape the webpage:
 URL = "https://news.ycombinator.com/"
 page = requests.get(URL)
-
 soup = BeautifulSoup(page.content, 'html.parser')
 
-all_stories = soup.find_all(class_='athing')
-print(all_stories[0])
+# data for each attribute
+# i'm pulling this all at the same time because the data could change if i pulled these at separate times
+titles_soup = soup.find_all(class_='athing')
+scores_soup = soup.find_all('span', class_='score')
+authors_soup = soup.find_all('a', class_='hnuser')
 
-# for story in all_stories:
-#     title = story.find(class_='storylink')
-#     author = story.find(class_='score')
-#     score = story.find(class_='hnuser')
-#     print(title.text, author.text, score.text)
+top_stories = []
 
-# title_results = soup.find_all('a', class_='storylink')
-# first_title = title_results[0].text
+def create_title_list(lst):
 
-# score_results = soup.find_all('span', class_='score')
-# first_score = score_results[0].text
+    title_list = []
 
-# author_results = soup.find_all('a', class_='hnuser')
-# first_author = author_results[0].text
+    for item in lst:
+        title = item.find(class_='storylink')
+        title_list.append(title.text)
+    
+    return title_list
 
-def get_titles(lst):
-    """Parses titles from soup results."""
+def create_authors_list(lst):
 
-    for title in lst:
-        story_title = title.text
-        print(title)
+    authors_list = []
 
-# gather titles, corresponding author names, points values
-# print as a list of objects
-# check first & last to make sure it's aligned (first author / last author are aligned)
+    for item in lst:
+        author = item.find(class_='hnuser')
+        authors_list.append(author.text)
+
+def create_score_list(lst):
+
+    scores_list = []
+
+    for item in lst:
+        score = item.find(class_='score')
+        scores_list.append(score.text)
+    
+    return scores_list
+
+# # I created a class for "Story". This is probably overkill, but it stores data nicely, and I was asked for a list of objects :)
+
+# class Story:
+#     """
+#     A class to represent a story. 
+#     Has attributes: title, author, and points.
+#     """
+    
+#     def __init__(self, title, author=None, points=None):
+#         self.title = title
+
