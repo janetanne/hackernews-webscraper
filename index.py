@@ -14,12 +14,23 @@ soup = BeautifulSoup(page.content, 'html.parser')
 # data for each attribute
 # i'm pulling this all at the same time because the data could change if i pulled these at separate times
 titles_soup = soup.find_all(class_='athing')
-scores_soup = soup.find_all('span', class_='score')
-authors_soup = soup.find_all('a', class_='hnuser')
+authors_soup = soup.find_all(class_='hnuser')
+scores_soup = soup.find_all(class_='score')
 
-top_stories = []
+# I created a class for "Story". This is probably overkill, but it stores data nicely, and I was asked for a list of objects :)
+class Story:
+    """
+    A class to represent a story. 
+    Has attributes: title, author, and points.
+    """
+    
+    def __init__(self, title, author, score):
+        self.title = title
+        self.author = author
+        self.score = score
 
-def create_title_list(lst):
+def create_titles_list(lst):
+    """Given a list of Hacker News data, returns the title of each top story."""
 
     title_list = []
 
@@ -30,31 +41,26 @@ def create_title_list(lst):
     return title_list
 
 def create_authors_list(lst):
+    """Given a list of Hacker News data, returns the author of each top story."""
 
     authors_list = []
 
     for item in lst:
-        author = item.find(class_='hnuser')
-        authors_list.append(author.text)
+        authors_list.append(item.text)
+    
+    return authors_list
 
-def create_score_list(lst):
+def create_scores_list(lst):
+    """Given a list of Hacker News data, returns the points of each top story."""
 
     scores_list = []
 
     for item in lst:
-        score = item.find(class_='score')
-        scores_list.append(score.text)
+        scores_list.append(item.text)
     
     return scores_list
 
-# # I created a class for "Story". This is probably overkill, but it stores data nicely, and I was asked for a list of objects :)
-
-# class Story:
-#     """
-#     A class to represent a story. 
-#     Has attributes: title, author, and points.
-#     """
-    
-#     def __init__(self, title, author=None, points=None):
-#         self.title = title
+top_titles = create_titles_list(titles_soup)
+top_authors = create_authors_list(authors_soup)
+top_scores = create_scores_list(scores_soup)
 
